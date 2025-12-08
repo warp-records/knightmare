@@ -15,4 +15,4 @@ Chess engine written in Rust. Hopefully will be strong enough to beat me, but I'
 - [ ] SIMD
 - [ ] Neural eval function
 
-<img src="assets/horsie.png" width="50%">
+<img src="assets/horsie.png" width="25%">
