@@ -1,6 +1,19 @@
 use arrayvec::*;
 
-
+// thanks https://stackoverflow.com/questions/47582781/multi-line-integer-literals-in-rust
+#[macro_export]
+macro_rules! chessboard {
+    ($line0:tt $line1:tt $line2:tt $line3:tt $line4:tt $line5:tt $line6:tt $line7:tt) => {
+        ($line0 << 56) |
+        ($line1 << 48) |
+        ($line2 << 40) |
+        ($line3 << 32) |
+        ($line4 << 24) |
+        ($line5 << 16) |
+        ($line6 <<  8) |
+        ($line7 <<  0)
+    }
+}
 
 #[derive(PartialEq)]
 enum Color { Black, White }
