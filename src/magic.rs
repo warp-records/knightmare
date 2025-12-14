@@ -45,6 +45,19 @@ pub fn gen_diagonal(x: u8, y: u8) -> u64 {
     right_down | left_up
 }
 
+const column_left: u64 = 0x8080808080808080;
+const row_top: u64 = 0xFF00000000000000;
+
+pub fn gen_straight(x: u8, y: u8) -> u64 {
+    let x = x as i8;
+    let y = y as i8;
+
+    let col = shr(column_left, x);
+    let row = shr(row_top, y*8);
+
+    col | row
+}
+
 pub fn print_bitboard(bb: u64) {
     for rank in (0..8).rev() {
         for file in (0..8).rev() {
