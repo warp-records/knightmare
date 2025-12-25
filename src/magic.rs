@@ -55,28 +55,34 @@ pub fn gen_diagonal_ray(x: u8, y: u8) -> u64 {
 pub fn gen_clipped_diagonal(x: u8, y: u8, other_pieces: u64) -> u64 {
     let (right_down, right_up) = get_diagonal_rays(x, y);
 
-    let top_part = u64::MAX << y*8;
+    let top_part = u64::MAX << (7-y)*8;
     let bottom_part = !top_part;
     // pretty sure this will work
-    let left_part = ((1u64 << x) - 1) * column_left;
-    let right_part = !left_part;
+    let right_part = u64::wrapping_mul((1u64 << 8-x) - 1, column_left) & !column_left;
+    // bottom row is lost during first multiply
+    let right_part = right_part | right_part >> 8;
+    let left_part = !right_part;
 
     // parse blockers and generate blocked rays by quadrant
-    let quad1_blockers: u64 = right_up & right_part & top_part & other_pieces;
+    let quad1 = right_part & top_part;
+    let quad1_blockers: u64 = right_up & quad1 & other_pieces;
     let nearest = quad1_blockers.trailing_zeros();
-    let quad1_diag = right_up & (u64::MAX >> 64-(nearest+1));
+    let quad1_diag = right_up & (u64::MAX >> 64-(nearest+1)) & quad1;
 
-    let quad2_blockers: u64 = right_down & left_part & top_part & other_pieces;
+    let quad2 = left_part & top_part;
+    let quad2_blockers: u64 = right_down & quad2 & other_pieces;
     let nearest = quad2_blockers.trailing_zeros();
-    let quad2_diag = right_down & (u64::MAX >> 64-(nearest+1));
+    let quad2_diag = right_down & (u64::MAX >> 64-(nearest+1)) & quad2;
 
-    let quad3_blockers: u64 = right_up & left_part & bottom_part & other_pieces;
+    let quad3 = left_part & bottom_part;
+    let quad3_blockers: u64 = right_up & quad3 & other_pieces;
     let nearest = quad3_blockers.leading_zeros();
-    let quad3_diag = right_up & (u64::MAX << (nearest+1));
+    let quad3_diag = right_up & (u64::MAX << 64-(nearest+1)) & quad3;
 
-    let quad4_blockers: u64 = right_up & right_part & bottom_part & other_pieces;
+    let quad4 = right_part & bottom_part;
+    let quad4_blockers: u64 = right_down & quad4 & other_pieces;
     let nearest = quad4_blockers.leading_zeros();
-    let quad4_diag = right_up & (u64::MAX << (nearest+1));
+    let quad4_diag = right_down & (u64::MAX << 64-(nearest+1)) & quad4;
 
     quad1_diag | quad2_diag | quad3_diag | quad4_diag
 }
@@ -207,7 +213,13 @@ pub fn gen_magic_table(pos: (u8, u8), orthogonal: bool) -> ArrayVec<u64, 4096> {
 }
 
 pub fn print_bitboard(bb: u64) {
+    print!("  ");
+    for i in 0..8 {
+        print!("{i} ");
+    }
+    println!();
     for rank in (0..8).rev() {
+        print!("{} ", 7-rank);
         for file in (0..8).rev() {
             let square = rank * 8 + file;
             if (bb >> square) & 1 == 1 {

@@ -84,6 +84,7 @@ mod tests {
             0b_00000000
         );
         let span: u64 = gen_clipped_diagonal(5, 4, blockers);
+        print_bitboard(span);
         let expected: u64 = chessboard!(
             0b_00000000
             0b_00000000
