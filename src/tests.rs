@@ -5,6 +5,7 @@ mod tests {
 
     use crate::game::*;
     use crate::magic::*;
+    use crate::movegen::*;
     use crate::chessboard;
 
     #[test]
@@ -83,7 +84,7 @@ mod tests {
             0b_00010000
             0b_00000000
         );
-        let span: u64 = gen_clipped_diagonal(5, 4, blockers);
+        let span: u64 = gen_blocked_diagonal(5, 4, blockers);
         print_bitboard(span);
         let expected: u64 = chessboard!(
             0b_00000000
@@ -112,7 +113,7 @@ mod tests {
             0b_10010010
             0b_00000000
         );
-        let span: u64 = gen_clipped_diagonal(3, 3, blockers);
+        let span: u64 = gen_blocked_diagonal(3, 3, blockers);
         let expected: u64 = chessboard!(
             0b_10000000
             0b_01000000
@@ -136,7 +137,7 @@ mod tests {
             0b_00000001
             0b_00010001
         );
-        let span: u64 = gen_clipped_diagonal(0, 0, blockers);
+        let span: u64 = gen_blocked_diagonal(0, 0, blockers);
         let expected: u64 = chessboard!(
             0b_00000000
             0b_01000000
@@ -164,7 +165,7 @@ mod tests {
             0b_00000000
             0b_00000000
         );
-        let span: u64 = gen_clipped_straight(3, 4, blockers);
+        let span: u64 = gen_blocked_straight(3, 4, blockers);
         let expected: u64 = chessboard!(
             0b_00000000
             0b_00000000
@@ -191,7 +192,7 @@ mod tests {
             0b_00000010
             0b_01010000
         );
-        let span: u64 = gen_clipped_straight(6, 7, blockers);
+        let span: u64 = gen_blocked_straight(6, 7, blockers);
         let expected = chessboard!(
             0b_00000000
             0b_00000000
