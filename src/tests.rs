@@ -127,33 +127,36 @@ mod tests {
         assert_eq!(span, expected);
     }
 
-    // #[test]
-    // pub fn test_straight_blockers() {
+    #[test]
+    pub fn test_straight_blockers() {
 
-    //     let blockers = chessboard!(
-    //         0b_00000000
-    //         0b_00000000
-    //         0b_00010000
-    //         0b_00010000
-    //         0b_01000000
-    //         0b_00010000
-    //         0b_00000000
-    //         0b_00000000
-    //     );
-    //     let span: u64 = gen_clipped_diagonal(3, 3, blockers);
-    //     let expected: u64 = chessboard!(
-    //         0b_00000000
-    //         0b_00000000
-    //         0b_00010000
-    //         0b_00010000
-    //         0b_01000000
-    //         0b_00010000
-    //         0b_00000000
-    //         0b_00000000
-    //     );
+        let blockers = chessboard!(
+            0b_00000000
+            0b_00000000
+            0b_00010000
+            0b_00000000
+            0b_01000000
+            0b_00010000
+            0b_00000000
+            0b_00000000
+        );
+        let span: u64 = gen_clipped_straight(3, 4, blockers);
+        let expected: u64 = chessboard!(
+            0b_00000000
+            0b_00000000
+            0b_00010000
+            0b_00010000
+            0b_01111111
+            0b_00010000
+            0b_00000000
+            0b_00000000
+        );
 
-    //     assert_eq!(span, expected);
-    // }
+        print_bitboard(span);
+        print_bitboard(expected);
+
+        assert_eq!(span, expected);
+    }
 
 
     #[test]
