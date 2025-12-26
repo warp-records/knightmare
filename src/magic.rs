@@ -44,24 +44,26 @@ pub fn gen_magic_table(x: u8, y: u8, orthogonal: bool) -> ArrayVec<u64, 4096> {
         range_board &= !(1u64 << next_pos);
     }
 
-    let mut blocker_map: ArrayVec<Option<u64>, 4096> = ArrayVec::from([None; 4096]);
+    let mut blocker_map_init: ArrayVec<Option<u64>, 4096> = ArrayVec::from([None; 4096]);
+    let max_len = blocker_map_init.len();
     unsafe {
-        let max_len = blocker_map.len();
         // 1024, 2048, or 4096 permutations of rays
-        blocker_map.set_len(2usize.pow(table_sz as u32));
-        assert!(blocker_map.len() <= max_len);
+        blocker_map_init.set_len(2usize.pow(table_sz as u32));
     }
+    assert!(blocker_map_init.len() <= max_len);
+
     let mut magic: u64 = 0;
+    let mut blocker_map = ArrayVec::new();
 
     while magic <= u64::MAX {
         let mut found_magic = true;
-        blocker_map = ArrayVec::new();
+        blocker_map = blocker_map_init.clone();
 
         // iteraete over every bitstring up to N bits
         for bitstr in 0..blocker_map.len() as u64 {
             // generate permutation of blockers along ray using current bitstring
             let mut blocker_board: u64 = 0;
-            for tbl_idx in 0..table_sz {
+            for tbl_idx in 0..bit_positions.len() {
                 let nth_bit  = (bitstr & (1u64 << tbl_idx)) >> tbl_idx;
                 blocker_board ^= nth_bit << (bit_positions[tbl_idx]);
             }
@@ -90,7 +92,9 @@ pub fn gen_magic_table(x: u8, y: u8, orthogonal: bool) -> ArrayVec<u64, 4096> {
         magic += 1;
     }
 
-    ArrayVec::new()
+    println!("{:?}", blocker_map);
+    blocker_map.into_iter().map(|opt| opt.unwrap())
+            .collect::<ArrayVec<u64, 4096>>()
 }
 
 pub fn print_bitboard(bb: u64) {

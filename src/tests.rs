@@ -225,6 +225,13 @@ mod tests {
 
         assert_eq!(span, expected);
     }
+
+    #[test]
+    pub fn test_magics_gen() {
+        let table = gen_magic_table(4, 6, false);
+        println!("{:?}", table);
+        assert!(false);
+    }
 }
 
 // 0 0 0 0 0 0 0 0
