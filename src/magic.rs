@@ -2,6 +2,7 @@
 use crate::movegen::*;
 use std::cmp::{min, max};
 use arrayvec::*;
+use rand::Rng;
 
 // attempt to generate a table of magic bitboards
 // N is either 10, 11, or 12 depending on
@@ -10,7 +11,7 @@ struct MagicTable<const N: usize> {
     magic: u64,
 }
 
-pub fn gen_magic_table(x: u8, y: u8, orthogonal: bool) -> ArrayVec<u64, 4096> {
+pub fn gen_magic_table(x: u8, y: u8, orthogonal: bool) -> (ArrayVec<u64, 4096>, u64) {
     let mut range_board = if orthogonal { gen_straight_ray(x, y) } else { gen_diagonal_ray(x, y) };
 
     // remove redundant ranks and files
@@ -52,12 +53,14 @@ pub fn gen_magic_table(x: u8, y: u8, orthogonal: bool) -> ArrayVec<u64, 4096> {
     }
     assert!(blocker_map_init.len() <= max_len);
 
+    let mut rng = rand::thread_rng();
     let mut magic: u64 = 0;
     let mut blocker_map = ArrayVec::new();
 
-    while magic <= u64::MAX {
+    loop {
         let mut found_magic = true;
         blocker_map = blocker_map_init.clone();
+        magic = rng.random::<u64>() & rng.random::<u64>() & rng.random::<u64>();
 
         // iteraete over every bitstring up to N bits
         for bitstr in 0..blocker_map.len() as u64 {
@@ -65,11 +68,11 @@ pub fn gen_magic_table(x: u8, y: u8, orthogonal: bool) -> ArrayVec<u64, 4096> {
             let mut blocker_board: u64 = 0;
             for tbl_idx in 0..bit_positions.len() {
                 let nth_bit  = (bitstr & (1u64 << tbl_idx)) >> tbl_idx;
-                blocker_board ^= nth_bit << (bit_positions[tbl_idx]);
+                blocker_board |= nth_bit << (bit_positions[tbl_idx]);
             }
 
             // check for collision at the index our magic gives us
-            let map_index = (blocker_board * magic) as usize % blocker_map.len();
+            let map_index = blocker_board.wrapping_mul(magic) as usize % blocker_map.len();
             if blocker_map[map_index].is_some() {
                 found_magic = false;
                 break;
@@ -89,12 +92,12 @@ pub fn gen_magic_table(x: u8, y: u8, orthogonal: bool) -> ArrayVec<u64, 4096> {
             break;
         }
 
-        magic += 1;
     }
 
-    println!("{:?}", blocker_map);
-    blocker_map.into_iter().map(|opt| opt.unwrap())
-            .collect::<ArrayVec<u64, 4096>>()
+    let blocker_map = blocker_map.into_iter().map(|opt| opt.unwrap())
+        .collect::<ArrayVec<u64, 4096>>();
+
+    (blocker_map, magic)
 }
 
 pub fn print_bitboard(bb: u64) {
