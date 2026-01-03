@@ -13,7 +13,7 @@ mod tests {
     pub fn test_diagonals() {
         let span = gen_diagonal_ray(3, 0);
         let expected: u64 = chessboard!(
-                0b_00010000
+                0b_00000000
                 0b_00101000
                 0b_01000100
                 0b_10000010
@@ -31,7 +31,7 @@ mod tests {
             0b_00001000
             0b_00010000
             0b_10100000
-            0b_01000000
+            0b_00000000
             0b_10100000
             0b_00010000
             0b_00001000
@@ -48,7 +48,7 @@ mod tests {
             0b_00000010
             0b_00000010
             0b_00000010
-            0b_11111111
+            0b_11111101
             0b_00000010
             0b_00000010
             0b_00000010
@@ -60,7 +60,7 @@ mod tests {
         let span: u64 = gen_straight_ray(2, 1);
         let expected = chessboard!(
             0b_00100000
-            0b_11111111
+            0b_11011111
             0b_00100000
             0b_00100000
             0b_00100000
