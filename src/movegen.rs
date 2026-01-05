@@ -5,7 +5,9 @@ const right_down_diag: u64 = 0x8040201008040201;
 const right_up_diag: u64 =    0x102040810204080;
 
 pub const column_left: u64 = 0x8080808080808080;
+pub const column_right: u64 = 0x8080808080808080 >> 7;
 pub const row_top: u64 = 0xFF00000000000000;
+pub const row_bottom: u64 = 0x00000000000000FF;
 
 const vertical_zeros_right: u64 = 0xFEFEFEFEFEFEFEFE;
 const vertical_zeros_left: u64 = 0x7F7F7F7F7F7F7F7F;
@@ -95,7 +97,7 @@ pub fn gen_blocked_diagonal(x: u8, y: u8, other_pieces: u64) -> u64 {
 }
 
 /// generate bitboard of straight ray accounting for blockers, inclusive of blockers and exclusve of origin
-fn gen_straight_rays(x: u8, y: u8) -> (u64, u64) {
+pub fn gen_straight_rays(x: u8, y: u8) -> (u64, u64) {
     let x = x as i8;
     let y = y as i8;
 

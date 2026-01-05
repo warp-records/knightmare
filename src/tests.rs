@@ -7,6 +7,7 @@ mod tests {
     use crate::magic::*;
     use crate::movegen::*;
     use crate::chessboard;
+    use rand::rand_core::block;
     use rand::{SeedableRng, Rng, rngs::StdRng};
 
     #[test]
@@ -226,25 +227,40 @@ mod tests {
     #[test]
     pub fn test_magics_gen() {
 
-        let ray = gen_diagonal_ray(2, 4);
-        let (table, magic) = gen_magic_table(2, 4, false);
 
-        let mut rng = StdRng::seed_from_u64(0);
-        for _ in 0..1_000 {
+        let mut rng = rand::rng();//StdRng::seed_from_u64(0);
+
+        for _ in 0..100 {
             let rand_board: u64 = rng.random::<u64>() & rng.random::<u64>() & rng.random::<u64>();
-            println!("{rand_board}");
+            let straight = true;//rng.random::<bool>();
+
+            let x: u8 = rng.random_range(0..=7);
+            let y: u8 = rng.random_range(0..=7);
+
+            let (table, magic) = gen_magic_table(x, y, straight);
+
+            let ray = if straight {
+                let ray = gen_straight_rays(x, y);
+                clip_straight(ray.0, ray.1)
+            } else {
+                clip_diagonal(gen_diagonal_ray(x, y))
+            };
+
             let mut blocker_board = rand_board & ray;
 
-            blocker_board &= !column_left;
-            blocker_board &= !(column_left >> 7);
-            blocker_board &= !row_top;
-            blocker_board &= !(row_top >> 56);
+            let table_sz = calc_shift(x, y);
 
-            let table_sz = 10;
-
-            let expected = gen_blocked_diagonal(2, 4, blocker_board);
+            let expected = if straight {
+                gen_blocked_straight(x, y, blocker_board)
+            } else {
+                gen_blocked_diagonal(x, y, blocker_board)
+            };
 
             let map_index = gen_table_idx(blocker_board, magic, table_sz);
+            if table[map_index] != expected {
+                print_bitboard(table[map_index]);
+                print_bitboard(expected);
+            }
             assert_eq!(table[map_index], expected);
         }
     }
