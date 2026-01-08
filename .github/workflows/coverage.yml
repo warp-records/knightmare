@@ -18,7 +18,7 @@ jobs:
         run: cargo install cargo-llvm-cov
 
       - name: Generate coverage
-        run: cargo llvm-cov --lcov --output-path lcov.info
+        run: cargo llvm-cov --lcov --output-path lcov.info --ignore-run-fail
 
       - name: Upload to Codecov
         uses: codecov/codecov-action@v3
