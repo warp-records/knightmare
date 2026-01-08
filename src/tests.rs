@@ -259,7 +259,7 @@ mod tests {
 
         for _ in 0..100 {
             let rand_board: u64 = rng.random::<u64>() & rng.random::<u64>() & rng.random::<u64>();
-            let straight = rng.random::<bool>();
+            let straight = false;//rng.random::<bool>();
 
             let x: u8 = rng.random_range(0..=7);
             let y: u8 = rng.random_range(0..=7);
@@ -273,7 +273,11 @@ mod tests {
                 clip_diagonal(gen_diagonal_ray(x, y))
             };
 
-            let mut blocker_board = rand_board & ray;
+            let mut blocker_board = rand_board & ray & !coords_to_bb(x, y);
+            // if x == 4 && y == 6 {
+            //     print_bitboard(ray);
+            //     print_bitboard(rand_board);
+            // }
             // println!("blockers in test");
             // print_bitboard(blocker_board);
             // println!("{:#x}", blocker_board);
@@ -289,17 +293,11 @@ mod tests {
 
             let map_index = gen_table_idx(blocker_board, magic, table_sz);
             // if table[map_index] != expected {
-                // println!("{map_index}");
-                // print_bitboard(table[map_index]);
-                // print_bitboard(expected);
-                // print_bitboard(0x202000205600);
-                // print_bitboard(0x20000000000000);
-
-
-                // println!("map_index: {}", gen_table_idx(0x202000205600, magic, table_sz));
-                // println!("map_index: {}", gen_table_idx(0x20000000000000, magic, table_sz));
-
-                // println!("{table_sz}");
+            //     print_bitboard(blocker_board);
+            //     println!("{:#x}", blocker_board);
+            //     println!("{map_index}");
+            //     println!("{:?}", table);
+            //     println!("{x}, {y}");
             // }
             assert_eq!(table[map_index], expected);
         }

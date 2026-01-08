@@ -82,7 +82,7 @@ pub fn gen_magic_table(x: u8, y: u8, orthogonal: bool) -> (ArrayVec<u64, 4096>, 
         clip_diagonal(diag)
     };
     // remove the piece's position from blocker permutations
-    range_board &= !(0b1 << coords_to_left_shift(x, y));
+    range_board &= !coords_to_bb(x, y);
 
     let table_sz = calc_shift(x, y);
 
@@ -114,6 +114,9 @@ pub fn gen_magic_table(x: u8, y: u8, orthogonal: bool) -> (ArrayVec<u64, 4096>, 
         blocker_map_occupied.fill(false);
         magic = rng.random::<u64>() & rng.random::<u64>() & rng.random::<u64>();
 
+        // DEBUG
+        // let mut max_idx: u64 = 0;
+
         // iteraete over every bitstring up to N bits
         for bitstr in 0..blocker_map.len() as u64 {
             // generate permutation of blockers along ray using current bitstring
@@ -122,6 +125,16 @@ pub fn gen_magic_table(x: u8, y: u8, orthogonal: bool) -> (ArrayVec<u64, 4096>, 
                 let nth_bit  = (bitstr & (1u64 << tbl_idx)) >> tbl_idx;
                 blocker_board |= nth_bit << (bit_positions[tbl_idx]);
             }
+
+            // if x == 4 && y == 6 {
+            //     if bitstr == (blocker_map.len()-1) as u64  {
+            //         println!("{:b}", bitstr);
+            //         println!("max bitboard: ");
+            //         print_bitboard(blocker_board);
+            //     }
+
+            //     max_idx = bitstr;
+            // }
 
             // check for collision at the index our magic gives us
             // let map_index = (blocker_board.wrapping_mul(magic) >> (64-table_sz)) as usize;
@@ -150,6 +163,12 @@ pub fn gen_magic_table(x: u8, y: u8, orthogonal: bool) -> (ArrayVec<u64, 4096>, 
                 clip_diagonal(gen_blocked_diagonal(x, y, blocker_board))
             };
 
+            // if x == 4 && y == 6 && blocker_board == 0x8000800 {
+            //     println!("blocker_board:");
+            //     print_bitboard(blocker_board);
+            //     println!("blocked ray:");
+            //     print_bitboard(blocked_ray);
+            // }
 
             if blocker_map_occupied[map_index] {
                 let existing_move = blocker_map[map_index];
@@ -171,9 +190,18 @@ pub fn gen_magic_table(x: u8, y: u8, orthogonal: bool) -> (ArrayVec<u64, 4096>, 
             }
         }
 
+        // if x == 4 && y == 6 {
+        //     println!("max idx: {max_idx}");
+        // } else {
+        //     println!("{x}, {y}");
+        // }
+
         if found_magic {
             break;
         }
+        // println!("{}in occupied", if blocker_map_occupied[769] { "" } else { "not "} );
+        // println!("{}in map", if blocker_map[769] != 0 { "" } else { "not "} );
+
 
     }
 

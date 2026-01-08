@@ -179,3 +179,8 @@ pub fn coords_to_right_shift(x: u8, y: u8) -> u8 {
 pub fn coords_to_left_shift(x: u8, y: u8) -> u8 {
     (7-y)*8 + 7 - x
 }
+
+/// generate a bitboard with a single tile at the given position.
+pub fn coords_to_bb(x: u8, y: u8) -> u64 {
+    0b1u64 >> (x + y*8)
+}
