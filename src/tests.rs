@@ -11,7 +11,7 @@ mod tests {
     use rand::{SeedableRng, Rng, rngs::StdRng};
 
     #[test]
-    pub fn test_diagonals() {
+    pub fn diagonals_simple() {
         let span = gen_diagonal_ray(3, 0);
         let expected: u64 = chessboard!(
                 0b_00000000
@@ -42,7 +42,7 @@ mod tests {
     }
 
     #[test]
-    pub fn test_straight() {
+    pub fn straight_simple() {
 
         let span: u64 = gen_straight_ray(6, 3);
         let expected = chessboard!(
@@ -74,7 +74,7 @@ mod tests {
     }
 
     #[test]
-    pub fn test_diagonal_blockers() {
+    pub fn diagonal_blockers_simple() {
 
         let blockers = chessboard!(
             0b_00000000
@@ -102,7 +102,7 @@ mod tests {
     }
 
     #[test]
-    pub fn test_diagonal_blockers_complex() {
+    pub fn diagonal_blockers_complex() {
 
         let blockers = chessboard!(
             0b_10001000
@@ -154,7 +154,7 @@ mod tests {
     }
 
     #[test]
-    pub fn test_straight_blockers() {
+    pub fn straight_blockers_simple() {
 
         let blockers = chessboard!(
             0b_00000000
@@ -235,7 +235,7 @@ mod tests {
 
 
     #[test]
-    pub fn test_knight() {
+    pub fn knight() {
 
         let span: u64 = gen_knight(6, 4);
         let expected: u64 = chessboard!(
@@ -253,7 +253,7 @@ mod tests {
     }
 
     #[test]
-    pub fn test_magics_gen() {
+    pub fn magics_gen() {
 
         let mut rng = StdRng::seed_from_u64(0);
 
@@ -273,7 +273,7 @@ mod tests {
                 clip_diagonal(gen_diagonal_ray(x, y))
             };
 
-            let mut blocker_board = rand_board & ray & !coords_to_bb(x, y);
+            let blocker_board = rand_board & ray & !coords_to_bb(x, y);
 
             let table_sz = calc_shift(x, y);
 
@@ -285,21 +285,21 @@ mod tests {
             };
 
             let map_index = gen_table_idx(blocker_board, magic, table_sz);
-            if table[map_index] != expected {
-                println!("origin: {x}, {y}");
-                println!("ray type: {}", if straight { "straight" } else { "diagonal" });
-                println!("ray:");
-                print_bitboard(ray);
-                println!("blockers board:");
-                println!("hex: {:#x}", blocker_board);
-                print_bitboard(blocker_board);
-                println!("value in table:");
-                println!("hex: {:#x}", table[map_index]);
-                print_bitboard(table[map_index]);
-                println!("expected value:");
-                println!("hex: {:#x}", expected);
-                print_bitboard(expected);
-            }
+            // if table[map_index] != expected {
+            //     println!("origin: {x}, {y}");
+            //     println!("ray type: {}", if straight { "straight" } else { "diagonal" });
+            //     println!("ray:");
+            //     print_bitboard(ray);
+            //     println!("blockers board:");
+            //     println!("hex: {:#x}", blocker_board);
+            //     print_bitboard(blocker_board);
+            //     println!("value in table:");
+            //     println!("hex: {:#x}", table[map_index]);
+            //     print_bitboard(table[map_index]);
+            //     println!("expected value:");
+            //     println!("hex: {:#x}", expected);
+            //     print_bitboard(expected);
+            // }
             assert_eq!(table[map_index], expected);
         }
     }
