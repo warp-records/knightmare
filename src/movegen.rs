@@ -2,13 +2,15 @@ use std::cmp::{max, min};
 
 use crate::magic::print_bitboard;
 
+// bitboard movegen
+
 const right_down_diag: u64 = 0x8040201008040201;
 const right_up_diag: u64 = 0x102040810204080;
 
-pub const column_left: u64 = 0x8080808080808080;
-pub const column_right: u64 = 0x8080808080808080 >> 7;
-pub const row_top: u64 = 0xFF00000000000000;
-pub const row_bottom: u64 = 0x00000000000000FF;
+pub const COLUMN_LEFT: u64 = 0x8080808080808080;
+pub const COLUMN_RIGHT: u64 = 0x8080808080808080 >> 7;
+pub const ROW_TOP: u64 = 0xFF00000000000000;
+pub const ROW_BOTTOM: u64 = 0x00000000000000FF;
 
 const vertical_zeros_right: u64 = 0xFEFEFEFEFEFEFEFE;
 const vertical_zeros_left: u64 = 0x7F7F7F7F7F7F7F7F;
@@ -73,7 +75,7 @@ pub fn gen_blocked_diagonal(x: u8, y: u8, other_pieces: u64) -> u64 {
     let top_area = u64::MAX << (7 - y) * 8;
     let bottom_area = !top_area;
     // pretty sure this will work
-    let right_area = u64::wrapping_mul((1u64 << 8 - x) - 1, column_left) & !column_left;
+    let right_area = u64::wrapping_mul((1u64 << 8 - x) - 1, COLUMN_LEFT) & !COLUMN_LEFT;
     // bottom row is lost during first multiply
     let right_area = right_area | right_area >> 8;
     let left_area = !right_area;
@@ -109,8 +111,8 @@ pub fn gen_straight_rays(x: u8, y: u8) -> (u64, u64) {
     let x = x as i8;
     let y = y as i8;
 
-    let vert = shr(column_left, x);
-    let horiz = shr(row_top, y * 8);
+    let vert = shr(COLUMN_LEFT, x);
+    let horiz = shr(ROW_TOP, y * 8);
 
     (vert & !piece_bb, horiz & !piece_bb)
 }
@@ -127,7 +129,7 @@ pub fn gen_blocked_straight(x: u8, y: u8, other_pieces: u64) -> u64 {
     let top_area = u64::MAX << (7 - y) * 8;
     let bottom_area = !top_area;
     let top_area = top_area << 8;
-    let right_area = u64::wrapping_mul((1u64 << 8 - x) - 1, column_left) & !column_left;
+    let right_area = u64::wrapping_mul((1u64 << 8 - x) - 1, COLUMN_LEFT) & !COLUMN_LEFT;
     let right_area = right_area | right_area >> 8;
     let left_area = !right_area << 1 & vertical_zeros_right;
 
@@ -176,6 +178,7 @@ pub fn gen_knight(x: u8, y: u8) -> u64 {
     moves
 }
 
+
 /// convert a number of tiles - from left to right, bottom to top - to an (x, y) coordinate position
 pub fn shift_to_coords(offset: u8) -> (u8, u8) {
     (offset % 8, offset / 8)
@@ -193,4 +196,9 @@ pub fn coords_to_left_shift(x: u8, y: u8) -> u8 {
 /// generate a bitboard with a single tile at the given position.
 pub fn coords_to_bb(x: u8, y: u8) -> u64 {
     0b1u64 << 63 - (x + y * 8)
+}
+
+/// right shift to bitboard cause I ain't typin this shit out every time
+pub fn rs_to_bb(right_shift: u32) -> u64 {
+    0b1000000000000000000000000000000000000000000000000000000000000000u64 >> right_shift
 }

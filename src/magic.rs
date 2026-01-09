@@ -31,18 +31,18 @@ impl MagicTable {
     }
 
     /// remove edges from diagonal ray
-    pub fn clip_diagonal(mut range_board: u64) -> u64 {
-        range_board &= !column_left;
-        range_board &= !column_right;
-        range_board &= !row_top;
-        range_board &= !row_bottom;
+    fn clip_diagonal(mut range_board: u64) -> u64 {
+        range_board &= !COLUMN_LEFT;
+        range_board &= !COLUMN_RIGHT;
+        range_board &= !ROW_TOP;
+        range_board &= !ROW_BOTTOM;
 
         range_board
     }
 
     // remove top and bottom edges from vertical ray and left and right edgs from horizontal ray
-    pub fn clip_straight(vertical: u64, horizontal: u64) -> u64 {
-        (vertical & !row_top & !row_bottom) | (horizontal & !column_left & !column_right)
+    fn clip_straight(vertical: u64, horizontal: u64) -> u64 {
+        (vertical & !ROW_TOP & !ROW_BOTTOM) | (horizontal & !COLUMN_LEFT & !COLUMN_RIGHT)
     }
 
     fn calc_shift(x: u8, y: u8) -> u8 {
@@ -115,9 +115,9 @@ impl MagicTable {
 
                 let blocked_ray = if straight {
                     let blocked_straight = gen_blocked_straight(x, y, blocker_board);
-                    blocked_straight & clipped_ray
+                    blocked_straight
                 } else {
-                    gen_blocked_diagonal(x, y, blocker_board) & clipped_ray
+                    gen_blocked_diagonal(x, y, blocker_board)
                 };
 
                 if blocker_map_occupied[map_index] {

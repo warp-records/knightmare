@@ -256,18 +256,18 @@ mod tests {
 
             let clipped_ray = if straight {
                 let (vertical, horizontal) = gen_straight_rays(x, y);
-                (vertical & !row_top & !row_bottom) | (horizontal & !column_left & !column_right)
+                (vertical & !ROW_TOP & !ROW_BOTTOM) | (horizontal & !COLUMN_LEFT & !COLUMN_RIGHT)
             } else {
-                gen_diagonal_ray(x, y) & !column_left & !column_right & !row_top & !row_bottom
+                gen_diagonal_ray(x, y) & !COLUMN_LEFT & !COLUMN_RIGHT & !ROW_TOP & !ROW_BOTTOM
             };
 
 
             let blocker_board = rand_board & clipped_ray;
 
             let expected = if straight {
-                gen_blocked_straight(x, y, blocker_board) & clipped_ray
+                gen_blocked_straight(x, y, blocker_board)
             } else {
-                gen_blocked_diagonal(x, y, blocker_board) & clipped_ray
+                gen_blocked_diagonal(x, y, blocker_board)
             };
 
             // if magic_table.get_ray(blocker_board) != Some(expected) {
