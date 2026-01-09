@@ -22,6 +22,7 @@ fn shr(val: u64, dist: i8) -> u64 {
 }
 
 fn get_diagonal_rays(x: u8, y: u8) -> (u64, u64) {
+    let piece_bb = coords_to_bb(x, y);
     // necessary for underflow
     let x = x as i8;
     let y = y as i8;
@@ -55,22 +56,18 @@ fn get_diagonal_rays(x: u8, y: u8) -> (u64, u64) {
         right_up &= shr(mask, shift_amt);
     }
 
-    (right_down, right_up)
+    (right_down & !piece_bb, right_up & !piece_bb)
 }
 
 /// generate bitboard of unbounded diagonal ray starting at position
 pub fn gen_diagonal_ray(x: u8, y: u8) -> u64 {
-    let piece_bit = 1u64 << coords_to_left_shift(x, y);
-
     let (right_down, right_up) = get_diagonal_rays(x, y);
-    (right_down | right_up) & !piece_bit
+    (right_down | right_up) & !coords_to_bb(x, y)
 }
 
 /// generate diagonal bitboard accounting for blockers, inclusive of blockers in ray and exclusve of origin
 pub fn gen_blocked_diagonal(x: u8, y: u8, other_pieces: u64) -> u64 {
     let (right_down, right_up) = get_diagonal_rays(x, y);
-
-    let piece_bit = 1u64 << coords_to_left_shift(x, y);
 
     // partition board into areas relative to piece origin
     let top_area = u64::MAX << (7 - y) * 8;
@@ -102,32 +99,30 @@ pub fn gen_blocked_diagonal(x: u8, y: u8, other_pieces: u64) -> u64 {
     let nearest = quad4_blockers.leading_zeros();
     let quad4_diag = right_down & (u64::MAX << 64 - min(nearest + 1, 64)) & quad4;
 
-    (quad1_diag | quad2_diag | quad3_diag | quad4_diag) & !piece_bit
+    quad1_diag | quad2_diag | quad3_diag | quad4_diag
 }
 
 /// generate bitboard of straight ray accounting for blockers, inclusive of blockers and exclusve of origin
 /// returns (vertical, horizontal)
 pub fn gen_straight_rays(x: u8, y: u8) -> (u64, u64) {
+    let piece_bb = coords_to_bb(x, y);
     let x = x as i8;
     let y = y as i8;
 
     let vert = shr(column_left, x);
     let horiz = shr(row_top, y * 8);
 
-    (vert, horiz)
+    (vert & !piece_bb, horiz & !piece_bb)
 }
 
 /// generate bitboard of unbounded straight ray starting at position
 pub fn gen_straight_ray(x: u8, y: u8) -> u64 {
-    let piece_bit = 1u64 << coords_to_left_shift(x, y);
-
     let (col, row) = gen_straight_rays(x, y);
-    (col | row) & !piece_bit
+    (col | row)
 }
 
 pub fn gen_blocked_straight(x: u8, y: u8, other_pieces: u64) -> u64 {
     let (col, row) = gen_straight_rays(x, y);
-    let piece_bit = 1u64 << coords_to_left_shift(x, y);
 
     let top_area = u64::MAX << (7 - y) * 8;
     let bottom_area = !top_area;
@@ -160,7 +155,7 @@ pub fn gen_blocked_straight(x: u8, y: u8, other_pieces: u64) -> u64 {
         right_ray = row & right_area;
     }
 
-    (top_ray | bottom_ray | left_ray | right_ray) & !piece_bit
+    top_ray | bottom_ray | left_ray | right_ray
 }
 
 pub fn gen_knight(x: u8, y: u8) -> u64 {

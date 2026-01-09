@@ -42,9 +42,9 @@ pub fn generate_magics() -> (Vec<[MagicTable; 8]>, Vec<[MagicTable; 8]>) {
 
     for x in 0..8 {
         for y in 0..8 {
-            let table = gen_magic_table(x as u8, y as u8, true);
+            let table = MagicTable::gen_table(x as u8, y as u8, true);
             straight_magics[x][y] = table;
-            let table = gen_magic_table(x as u8, y as u8, false);
+            let table = MagicTable::gen_table(x as u8, y as u8, false);
             diagonal_magics[x][y] = table;
         }
     }
