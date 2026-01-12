@@ -280,6 +280,9 @@ mod tests {
             assert_eq!(magic_table.get_ray(blocker_board), Some(expected));
         }
     }
+
+    #[test]
+    pub fn test_rook_moves();
 }
 
 // 0 0 0 0 0 0 0 0
