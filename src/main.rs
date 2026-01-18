@@ -1,5 +1,5 @@
 use arrayvec::ArrayVec;
-use horsie::{chessboard, magic::*, movegen::*};
+use horsie::{chessboard, game::GameState, magic::*, movegen::*};
 use rand::Rng;
 
 fn main() {
@@ -8,8 +8,6 @@ fn main() {
     if let Ok(art) = std::fs::read_to_string("assets/art.txt") {
         println!("{art}");
     }
-
-    let mut rng = rand::rng();
 
     // for _ in 0..100_000_000 {
     //     let x = rng.gen_range(0..8);
@@ -25,7 +23,8 @@ fn main() {
     // }
 
     // this looks ugly as fuck
-    generate_magics();
+    let mut game = GameState::new();
+    game.init_magics();
 
     // boo! hello thereeeeee.......
 }
@@ -42,9 +41,9 @@ pub fn generate_magics() -> (Vec<[MagicTable; 8]>, Vec<[MagicTable; 8]>) {
 
     for x in 0..8 {
         for y in 0..8 {
-            let table = MagicTable::gen_table(x as u8, y as u8, true);
+            let table = MagicTable::gen_table(x, y, true);
             straight_magics[x][y] = table;
-            let table = MagicTable::gen_table(x as u8, y as u8, false);
+            let table = MagicTable::gen_table(x, y, false);
             diagonal_magics[x][y] = table;
         }
     }

@@ -252,7 +252,7 @@ mod tests {
             let x: u8 = rng.random_range(0..=7);
             let y: u8 = rng.random_range(0..=7);
 
-            let magic_table = MagicTable::gen_table(x, y, straight);
+            let magic_table = MagicTable::gen_table(x as usize, y as usize, straight);
 
             let clipped_ray = if straight {
                 let (vertical, horizontal) = gen_straight_rays(x, y);
@@ -279,6 +279,11 @@ mod tests {
             // }
             assert_eq!(magic_table.get_ray(blocker_board), Some(expected));
         }
+    }
+
+    #[test]
+    pub fn rook_simple() {
+
     }
 
 }

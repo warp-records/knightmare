@@ -120,7 +120,7 @@ pub fn gen_straight_rays(x: u8, y: u8) -> (u64, u64) {
 /// generate bitboard of unbounded straight ray starting at position
 pub fn gen_straight_ray(x: u8, y: u8) -> u64 {
     let (col, row) = gen_straight_rays(x, y);
-    (col | row)
+    col | row
 }
 
 pub fn gen_blocked_straight(x: u8, y: u8, other_pieces: u64) -> u64 {

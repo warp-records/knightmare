@@ -1,9 +1,10 @@
 use crate::movegen::*;
 use arrayvec::*;
 use rand::{rngs::StdRng, Rng, SeedableRng};
+use serde::{Deserialize, Serialize};
 
 // attempt to generate a table of magic bitboards
-#[derive(Default)]
+#[derive(Default, Serialize, Deserialize)]
 pub struct MagicTable {
     table: ArrayVec<u64, 4096>,
     magic: u64,
@@ -60,7 +61,10 @@ impl MagicTable {
     }
 
     /// generate a lookup table of bitboards representing the blocked movespace of a piece, and a magic value for indexing
-    pub fn gen_table(x: u8, y: u8, straight: bool) -> Self {
+    pub fn gen_table(x: usize, y: usize, straight: bool) -> Self {
+        let x = x as u8;
+        let y = y as u8;
+
         let mut range_board = if straight {
             let (horiz, vert) = gen_straight_rays(x, y);
             Self::clip_straight(horiz, vert)

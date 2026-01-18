@@ -1,4 +1,7 @@
 use arrayvec::*;
+use serde::{Serialize, Deserialize};
+use std::fs::File;
+use std::io::{BufReader, BufWriter};
 
 use crate::{magic::MagicTable, movegen::*};
 
@@ -74,7 +77,14 @@ impl Move {
     }
 }
 
+#[derive(Serialize, Deserialize)]
+struct MagicsDb {
+    magics_straight: Box<[[MagicTable; 8]; 8]>,
+    magics_diagonal: Box<[[MagicTable; 8]; 8]>,
+}
 impl GameState {
+
+    const MAGICS_FILE_PATH: &str = "magics/magics.db";
 
     pub fn new() -> GameState {
         const KINGS_INIT: u64 = chessboard!(
@@ -181,6 +191,41 @@ impl GameState {
             black: BLACK_SIDE,
             white: WHITE_SIDE,
         }
+    }
+
+
+    pub fn init_magics(&mut self) {
+        if let Ok(magics_db) = Self::read_magics_db() {
+            self.magics_straight = Some(magics_db.magics_straight);
+            self.magics_diagonal = Some(magics_db.magics_diagonal);
+        } else {
+            let mut magics_diagonal: Box<[[MagicTable; 8]; 8]> = Box::new(Default::default());
+            let mut magics_straight: Box<[[MagicTable; 8]; 8]> = Box::new(Default::default());
+
+            for x in 0..8 {
+                for y in 0..8 {
+                    magics_straight[x][y] = MagicTable::gen_table(x, y, true);
+                    magics_diagonal[x][y] = MagicTable::gen_table(x, y, false);
+                }
+            }
+
+            let file = File::create(Self::MAGICS_FILE_PATH).expect("Can't open file... what the fuck");
+            let mut writer = BufWriter::new(file);
+
+            let magic_db = MagicsDb {
+                magics_straight: magics_straight,
+                magics_diagonal: magics_diagonal,
+            };
+
+            bincode::serialize_into(&mut writer, &magic_db).expect("Failed to serialize and write magics db");
+        }
+    }
+
+    fn read_magics_db() -> Result<MagicsDb, ()> {
+        let mut file = BufReader::new(File::open(Self::MAGICS_FILE_PATH).map_err(|_| ())?);
+        let magics_db: MagicsDb = bincode::deserialize_from(&mut file).map_err(|_| ())?;
+
+        Ok(magics_db)
     }
 
     // Return order is from top to bottom, left to right formatted as (original_pos_bitboard, new_pos_bitboard)
