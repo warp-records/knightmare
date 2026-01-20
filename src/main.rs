@@ -26,18 +26,19 @@ fn main() {
     let mut game = GameState::new();
     game.init_magics();
 
+    // generate_magics();
+
+    // let rook_moves = game.rook_moves();
+    // println!("{:?}", rook_moves);
+
+
     // boo! hello thereeeeee.......
 }
 
-pub fn generate_magics() -> (Vec<[MagicTable; 8]>, Vec<[MagicTable; 8]>) {
+pub fn generate_magics() -> ([[MagicTable; 8]; 8], [[MagicTable; 8]; 8]) {
+    let mut straight_magics: [[MagicTable; 8]; 8] = Default::default();
+    let mut diagonal_magics: [[MagicTable; 8]; 8] = Default::default();
 
-    let mut straight_magics: Vec<[MagicTable; 8]> = (0..8)
-        .map(|_| std::array::from_fn(|_| MagicTable::default()))
-        .collect();
-
-    let mut diagonal_magics: Vec<[MagicTable; 8]> = (0..8)
-        .map(|_| std::array::from_fn(|_| MagicTable::default()))
-        .collect();
 
     for x in 0..8 {
         for y in 0..8 {

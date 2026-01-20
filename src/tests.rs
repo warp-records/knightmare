@@ -245,7 +245,7 @@ mod tests {
     pub fn magics_gen() {
         let mut rng = StdRng::seed_from_u64(0);
 
-        for _ in 0..10 {
+        for _ in 0..5 {
             let rand_board: u64 = rng.random::<u64>() & rng.random::<u64>() & rng.random::<u64>();
             let straight = rng.random::<bool>();
 

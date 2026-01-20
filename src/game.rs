@@ -26,6 +26,7 @@ enum Color {
     White,
 }
 
+#[derive(Debug)]
 enum PieceType {
     King,
     Queen,
@@ -38,8 +39,8 @@ enum PieceType {
 pub struct GameState {
     turn: Color,
 
-    magics_straight: Option<Box<[[MagicTable; 8]; 8]>>,
-    magics_diagonal: Option<Box<[[MagicTable; 8]; 8]>>,
+    magics_straight: Option<[[MagicTable; 8]; 8]>,
+    magics_diagonal: Option<[[MagicTable; 8]; 8]>,
 
     kings: u64,
     queens: u64,
@@ -59,6 +60,7 @@ pub struct GameState {
     // threats: u64,
 }
 
+#[derive(Debug)]
 pub struct Move {
     src: (u8, u8),
     dest: (u8, u8),
@@ -79,8 +81,8 @@ impl Move {
 
 #[derive(Serialize, Deserialize)]
 struct MagicsDb {
-    magics_straight: Box<[[MagicTable; 8]; 8]>,
-    magics_diagonal: Box<[[MagicTable; 8]; 8]>,
+    magics_straight: [[MagicTable; 8]; 8],
+    magics_diagonal: [[MagicTable; 8]; 8],
 }
 impl GameState {
 
@@ -199,8 +201,8 @@ impl GameState {
             self.magics_straight = Some(magics_db.magics_straight);
             self.magics_diagonal = Some(magics_db.magics_diagonal);
         } else {
-            let mut magics_diagonal: Box<[[MagicTable; 8]; 8]> = Box::new(Default::default());
-            let mut magics_straight: Box<[[MagicTable; 8]; 8]> = Box::new(Default::default());
+            let mut magics_diagonal: [[MagicTable; 8]; 8] = Default::default();
+            let mut magics_straight: [[MagicTable; 8]; 8] = Default::default();
 
             for x in 0..8 {
                 for y in 0..8 {
@@ -212,12 +214,15 @@ impl GameState {
             let file = File::create(Self::MAGICS_FILE_PATH).expect("Can't open file... what the fuck");
             let mut writer = BufWriter::new(file);
 
-            let magic_db = MagicsDb {
+            let magics_db = MagicsDb {
                 magics_straight: magics_straight,
                 magics_diagonal: magics_diagonal,
             };
 
-            bincode::serialize_into(&mut writer, &magic_db).expect("Failed to serialize and write magics db");
+            bincode::serialize_into(&mut writer, &magics_db).expect("Failed to serialize and write magics db");
+
+            self.magics_straight = Some(magics_db.magics_straight);
+            self.magics_diagonal = Some(magics_db.magics_diagonal);
         }
     }
 
@@ -298,6 +303,7 @@ impl GameState {
     // }
 
     // ignore whether or not we're in check for now
+    // castling moves implemented in king moves
     pub fn rook_moves(&self) -> ArrayVec<Move, 14> {
         let mut moveset = ArrayVec::new();
 
@@ -334,4 +340,16 @@ impl GameState {
         moveset
     }
 
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    pub fn rook_moves() {
+        let mut game = GameState::new();
+        game.init_magics();
+
+    }
 }

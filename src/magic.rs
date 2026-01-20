@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 // attempt to generate a table of magic bitboards
 #[derive(Default, Serialize, Deserialize)]
 pub struct MagicTable {
-    table: ArrayVec<u64, 4096>,
+    table: Vec<u64>,
     magic: u64,
     clipped_ray: u64,
     // either 10, 11, or 12
@@ -86,8 +86,8 @@ impl MagicTable {
             range_board &= !(1u64 << next_pos);
         }
 
-        let mut blocker_map: ArrayVec<u64, 4096> = ArrayVec::from([0; 4096]);
-        let mut blocker_map_occupied: ArrayVec<bool, 4096> = ArrayVec::from([false; 4096]);
+        let mut blocker_map: Vec<u64> = vec![0; 4096];
+        let mut blocker_map_occupied: Vec<bool> = vec![false; 4096];
         let max_len = 2usize.pow(index_bits as u32);
         unsafe {
             // 1024, 2048, or 4096 permutations of rays
@@ -146,7 +146,7 @@ impl MagicTable {
             .into_iter()
             .zip(blocker_map_occupied)
             .map(|(val, occupied)| if occupied { val } else { 0 })
-            .collect::<ArrayVec<u64, 4096>>();
+            .collect::<Vec<u64>>();
 
         Self {
             table: blocker_map,
