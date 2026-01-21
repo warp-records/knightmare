@@ -527,25 +527,20 @@ mod tests {
         moves.sort();
 
         assert_eq!(moves, expected);
-    }
 
-    #[test]
-    pub fn rook_moves_edge() {
-        // Rook in corner a1 with minimal blocking
-        // FEN: 8/8/8/8/8/8/1P6/R7 - white rook at a1, pawn at b2
+        // rook at (0, 7) with pawn at (1, 6)
         let mut game = GameState::try_from_fen("8/8/8/8/8/8/1P6/R7").unwrap();
         game.init_magics();
 
         let mut expected = vec![
-            // Rook at (0, 7) - a1
-            Move::new((0, 7), (1, 7)),  // right along rank
+            Move::new((0, 7), (1, 7)),
             Move::new((0, 7), (2, 7)),
             Move::new((0, 7), (3, 7)),
             Move::new((0, 7), (4, 7)),
             Move::new((0, 7), (5, 7)),
             Move::new((0, 7), (6, 7)),
             Move::new((0, 7), (7, 7)),
-            Move::new((0, 7), (0, 6)),  // up along file
+            Move::new((0, 7), (0, 6)),
             Move::new((0, 7), (0, 5)),
             Move::new((0, 7), (0, 4)),
             Move::new((0, 7), (0, 3)),
