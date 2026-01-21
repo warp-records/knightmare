@@ -429,6 +429,7 @@ impl GameState {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pretty_assertions::{assert_eq, assert_ne};
 
     #[test]
     pub fn import_fen() {
@@ -526,6 +527,37 @@ mod tests {
         moves.sort();
 
         assert_eq!(moves, expected);
+    }
 
+    #[test]
+    pub fn rook_moves_edge() {
+        // Rook in corner a1 with minimal blocking
+        // FEN: 8/8/8/8/8/8/1P6/R7 - white rook at a1, pawn at b2
+        let mut game = GameState::try_from_fen("8/8/8/8/8/8/1P6/R7").unwrap();
+        game.init_magics();
+
+        let mut expected = vec![
+            // Rook at (0, 7) - a1
+            Move::new((0, 7), (1, 7)),  // right along rank
+            Move::new((0, 7), (2, 7)),
+            Move::new((0, 7), (3, 7)),
+            Move::new((0, 7), (4, 7)),
+            Move::new((0, 7), (5, 7)),
+            Move::new((0, 7), (6, 7)),
+            Move::new((0, 7), (7, 7)),
+            Move::new((0, 7), (0, 6)),  // up along file
+            Move::new((0, 7), (0, 5)),
+            Move::new((0, 7), (0, 4)),
+            Move::new((0, 7), (0, 3)),
+            Move::new((0, 7), (0, 2)),
+            Move::new((0, 7), (0, 1)),
+            Move::new((0, 7), (0, 0)),
+        ];
+        expected.sort();
+
+        let mut moves: Vec<Move> = game.rook_moves().to_vec();
+        moves.sort();
+
+        assert_eq!(moves, expected);
     }
 }
