@@ -424,6 +424,41 @@ impl GameState {
         moveset
     }
 
+    pub fn bishop_moves(&self) -> ArrayVec<Move, 26> {
+        let mut moveset = ArrayVec::new();
+
+        let self_bb = self.self_bb();
+
+        let mut bishops_bb = self.self_bb() & self.bishops;
+
+        for _ in 0..2 {
+            let shift = bishops_bb.leading_zeros();
+            let src = shift_to_coords(shift as u8);
+
+            if bishops_bb == 0 {
+                break;
+            }
+
+            bishops_bb ^= rs_to_bb(shift);
+
+            let blockers = self.black | self.white & !coords_to_bb(src.0, src.1);
+            let magics_straight = self.magics_diagonal.as_ref().unwrap();
+            let mut moves_bb = magics_straight[src.0 as usize][src.1 as usize].get_ray(blockers).unwrap();
+
+            moves_bb &= !self_bb;
+
+            while moves_bb != 0 {
+                let shift = moves_bb.leading_zeros();
+                let dest = shift_to_coords(shift as u8);
+                moveset.push(Move::new(src, dest));
+
+                moves_bb ^= rs_to_bb(shift);
+            }
+
+        }
+
+        moveset
+    }
 }
 
 #[cfg(test)]
