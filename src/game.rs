@@ -1,6 +1,7 @@
 use arrayvec::*;
 use serde::{Serialize, Deserialize};
-use std::fs::File;
+use std::fs::{self, File};
+use std::path::Path;
 use std::io::{BufReader, BufWriter};
 
 use crate::{magic::MagicTable, movegen::*};
@@ -295,6 +296,10 @@ impl GameState {
                 }
             }
 
+            let path = Path::new(Self::MAGICS_FILE_PATH);
+            if let Some(parent) = path.parent() {
+                fs::create_dir_all(parent).expect("Can't create directory");
+            }
             let file = File::create(Self::MAGICS_FILE_PATH).expect("Can't open file... what the fuck");
             let mut writer = BufWriter::new(file);
 
@@ -397,7 +402,7 @@ impl GameState {
 
         for _ in 0..2 {
             let shift = rooks_bb.leading_zeros();
-            let src = shift_to_coords(shift as u8);
+            let src = right_shift_to_coords(shift as u8);
 
             if rooks_bb == 0 {
                 break;
@@ -413,7 +418,7 @@ impl GameState {
 
             while moves_bb != 0 {
                 let shift = moves_bb.leading_zeros();
-                let dest = shift_to_coords(shift as u8);
+                let dest = right_shift_to_coords(shift as u8);
                 moveset.push(Move::new(src, dest));
 
                 moves_bb ^= rs_to_bb(shift);
@@ -433,7 +438,7 @@ impl GameState {
 
         for _ in 0..2 {
             let shift = bishops_bb.leading_zeros();
-            let src = shift_to_coords(shift as u8);
+            let src = right_shift_to_coords(shift as u8);
 
             if bishops_bb == 0 {
                 break;
@@ -449,7 +454,7 @@ impl GameState {
 
             while moves_bb != 0 {
                 let shift = moves_bb.leading_zeros();
-                let dest = shift_to_coords(shift as u8);
+                let dest = right_shift_to_coords(shift as u8);
                 moveset.push(Move::new(src, dest));
 
                 moves_bb ^= rs_to_bb(shift);
@@ -464,7 +469,7 @@ impl GameState {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use pretty_assertions::{assert_eq, assert_ne};
+    // use pretty_assertions::{assert_eq, assert_ne};
 
     #[test]
     pub fn import_fen() {
@@ -512,24 +517,24 @@ mod tests {
         game.init_magics();
 
         let mut expected = vec![
-            Move::new((4, 3), (4, 1)),
-            Move::new((4, 3), (4, 2)),
-            Move::new((4, 3), (4, 4)),
-            Move::new((4, 3), (4, 5)),
-            Move::new((4, 3), (0, 3)),
-            Move::new((4, 3), (1, 3)),
-            Move::new((4, 3), (2, 3)),
-            Move::new((4, 3), (3, 3)),
-            Move::new((4, 3), (5, 3)),
-            Move::new((4, 3), (6, 3)),
-            Move::new((4, 3), (7, 3))
+            Move::new((4, 4), (4, 6)),
+            Move::new((4, 4), (4, 5)),
+            Move::new((4, 4), (4, 3)),
+            Move::new((4, 4), (4, 2)),
+            Move::new((4, 4), (0, 4)),
+            Move::new((4, 4), (1, 4)),
+            Move::new((4, 4), (2, 4)),
+            Move::new((4, 4), (3, 4)),
+            Move::new((4, 4), (5, 4)),
+            Move::new((4, 4), (6, 4)),
+            Move::new((4, 4), (7, 4))
         ];
         expected.sort();
 
         let mut moves: Vec<Move> = game.rook_moves().to_vec();
         moves.sort();
 
-        assert_eq!(moves, expected);
+        assert_eq!(expected, moves);
 
         // more complex position
         let mut game = GameState::try_from_fen("2r2r2/pk4pp/1p6/P1p1B3/8/2R2n2/2P2P1P/1R3K2").unwrap();
