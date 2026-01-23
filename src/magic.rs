@@ -165,10 +165,11 @@ pub fn print_bitboard(bb: u64) {
         print!("{i} ");
     }
     println!();
-    for rank in (0..8).rev() {
-        print!("{} ", 7 - rank);
+    // Print from rank 8 (y=7) at top to rank 1 (y=0) at bottom
+    for y in (0..8).rev() {
+        print!("{} ", y);
         for file in (0..8).rev() {
-            let square = rank * 8 + file;
+            let square = y * 8 + file;
             if (bb >> square) & 1 == 1 {
                 print!("◼ ");
             } else {

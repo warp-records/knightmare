@@ -9,7 +9,8 @@ mod tests {
 
     #[test]
     pub fn diagonals_simple() {
-        let span = gen_diagonal_ray(3, 0);
+        // Old (3, 0) was d8, new coords for d8 = (3, 7)
+        let span = gen_diagonal_ray(3, 7);
         let expected: u64 = chessboard!(
                 0b_00000000
                 0b_00101000
@@ -23,7 +24,8 @@ mod tests {
 
         assert_eq!(span, expected);
 
-        let span: u64 = gen_diagonal_ray(1, 4);
+        // Old (1, 4) was b4, new coords for b4 = (1, 3)
+        let span: u64 = gen_diagonal_ray(1, 3);
         let expected: u64 = chessboard!(
             0b_00000100
             0b_00001000
@@ -40,7 +42,8 @@ mod tests {
 
     #[test]
     pub fn straight_simple() {
-        let span: u64 = gen_straight_ray(6, 3);
+        // Old (6, 3) was g5, new coords for g5 = (6, 4)
+        let span: u64 = gen_straight_ray(6, 4);
         let expected = chessboard!(
             0b_00000010
             0b_00000010
@@ -54,7 +57,8 @@ mod tests {
 
         assert_eq!(span, expected);
 
-        let span: u64 = gen_straight_ray(2, 1);
+        // Old (2, 1) was c7, new coords for c7 = (2, 6)
+        let span: u64 = gen_straight_ray(2, 6);
         let expected = chessboard!(
             0b_00100000
             0b_11011111
@@ -81,7 +85,8 @@ mod tests {
             0b_00010000
             0b_00000000
         );
-        let span: u64 = gen_blocked_diagonal(5, 4, blockers);
+        // Old (5, 4) was f4, new coords for f4 = (5, 3)
+        let span: u64 = gen_blocked_diagonal(5, 3, blockers);
         let expected: u64 = chessboard!(
             0b_00000000
             0b_00000000
@@ -108,7 +113,8 @@ mod tests {
             0b_10010010
             0b_00000000
         );
-        let span: u64 = gen_blocked_diagonal(3, 3, blockers);
+        // Old (3, 3) was d5, new coords for d5 = (3, 4)
+        let span: u64 = gen_blocked_diagonal(3, 4, blockers);
         let expected: u64 = chessboard!(
             0b_10000000
             0b_01000000
@@ -132,7 +138,8 @@ mod tests {
             0b_00000001
             0b_00010001
         );
-        let span: u64 = gen_blocked_diagonal(0, 0, blockers);
+        // Old (0, 0) was a8, new coords for a8 = (0, 7)
+        let span: u64 = gen_blocked_diagonal(0, 7, blockers);
         let expected: u64 = chessboard!(
             0b_00000000
             0b_01000000
@@ -159,7 +166,8 @@ mod tests {
             0b_00000000
             0b_00000000
         );
-        let span: u64 = gen_blocked_straight(3, 4, blockers);
+        // Old (3, 4) was d4, new coords for d4 = (3, 3)
+        let span: u64 = gen_blocked_straight(3, 3, blockers);
         let expected: u64 = chessboard!(
             0b_00000000
             0b_00000000
@@ -183,7 +191,8 @@ mod tests {
             0b_00000010
             0b_01010000
         );
-        let span: u64 = gen_blocked_straight(6, 7, blockers);
+        // Old (6, 7) was g1, new coords for g1 = (6, 0)
+        let span: u64 = gen_blocked_straight(6, 0, blockers);
         let expected = chessboard!(
             0b_00000000
             0b_00000000
@@ -209,7 +218,8 @@ mod tests {
             0b_00000000
         );
 
-        let span: u64 = gen_blocked_straight(2, 6, blockers);
+        // Old (2, 6) was c2, new coords for c2 = (2, 1)
+        let span: u64 = gen_blocked_straight(2, 1, blockers);
         let expected: u64 = chessboard!(
             0b_00000000
             0b_00000000
@@ -226,7 +236,8 @@ mod tests {
 
     #[test]
     pub fn knight() {
-        let span: u64 = gen_knight(6, 4);
+        // Old (6, 4) was g4, new coords for g4 = (6, 3)
+        let span: u64 = gen_knight(6, 3);
         let expected: u64 = chessboard!(
             0b_00000000
             0b_00000000

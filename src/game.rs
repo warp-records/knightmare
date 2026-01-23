@@ -209,12 +209,15 @@ impl GameState {
         let mut black: u64 = 0;
         let mut white: u64 = 0;
 
-        let mut row: u8 = 0;
+        // FEN is read top-to-bottom (rank 8 first), so row 0 = rank 8 = y=7
+        let mut fen_row: u8 = 0;
 
         for row_contents in fen.split('/') {
-            if row > 7 {
+            if fen_row > 7 {
                 return Err(())
             }
+            // Convert FEN row (0=rank8, 7=rank1) to y coordinate (0=rank1, 7=rank8)
+            let y = 7 - fen_row;
             let mut col: u8 = 0;
 
             for ch in row_contents.chars() {
@@ -228,38 +231,38 @@ impl GameState {
 
                 match ch.to_ascii_lowercase() {
                     'k' => {
-                        kings |= coords_to_bb(col, row);
+                        kings |= coords_to_bb(col, y);
                     },
                     'q' => {
-                        queens |= coords_to_bb(col, row);
+                        queens |= coords_to_bb(col, y);
                     },
                     'r' => {
-                        rooks |= coords_to_bb(col, row);
+                        rooks |= coords_to_bb(col, y);
                     },
                     'b' => {
-                        bishops |= coords_to_bb(col, row);
+                        bishops |= coords_to_bb(col, y);
                     },
                     'n' => {
-                        knights |= coords_to_bb(col, row);
+                        knights |= coords_to_bb(col, y);
                     },
                     'p' => {
-                        pawns |= coords_to_bb(col, row);
+                        pawns |= coords_to_bb(col, y);
                     },
                     _ => {
                         return Err(())
                     }
                 }
 
-                *color |= coords_to_bb(col, row);
+                *color |= coords_to_bb(col, y);
                 col += 1;
             }
 
             if col != 8 { return Err(()); }
 
-            row += 1;
+            fen_row += 1;
         }
 
-        if row != 8 { return Err(()) }
+        if fen_row != 8 { return Err(()) }
 
         Ok(GameState {
             turn: Color::White,
@@ -512,22 +515,23 @@ mod tests {
 
     #[test]
     pub fn rook_moves() {
-        // starting board except with a rook at 4, 3
+        // starting board except with a rook at e5 (4, 4) - FEN row 3 = rank 5 = y=4
         let mut game = GameState::try_from_fen("rnbqkbnr/pppppppp/8/4R3/8/8/PPPPPPPP/RNBQKBN1").unwrap();
         game.init_magics();
 
         let mut expected = vec![
-            Move::new((4, 4), (4, 6)),
-            Move::new((4, 4), (4, 5)),
-            Move::new((4, 4), (4, 3)),
-            Move::new((4, 4), (4, 2)),
-            Move::new((4, 4), (0, 4)),
-            Move::new((4, 4), (1, 4)),
-            Move::new((4, 4), (2, 4)),
-            Move::new((4, 4), (3, 4)),
-            Move::new((4, 4), (5, 4)),
-            Move::new((4, 4), (6, 4)),
-            Move::new((4, 4), (7, 4))
+            // Rook at e5 (4, 4): can move along rank 5 and file e
+            Move::new((4, 4), (4, 6)), // e7 (blocked by pawn)
+            Move::new((4, 4), (4, 5)), // e6
+            Move::new((4, 4), (4, 3)), // e4
+            Move::new((4, 4), (4, 2)), // e3
+            Move::new((4, 4), (0, 4)), // a5
+            Move::new((4, 4), (1, 4)), // b5
+            Move::new((4, 4), (2, 4)), // c5
+            Move::new((4, 4), (3, 4)), // d5
+            Move::new((4, 4), (5, 4)), // f5
+            Move::new((4, 4), (6, 4)), // g5
+            Move::new((4, 4), (7, 4)), // h5
         ];
         expected.sort();
 
@@ -536,30 +540,31 @@ mod tests {
 
         assert_eq!(expected, moves);
 
-        // more complex position
+        // more complex position: "2r2r2/pk4pp/1p6/P1p1B3/8/2R2n2/2P2P1P/1R3K2"
+        // White rooks at b1 (1, 0) and c3 (2, 2)
         let mut game = GameState::try_from_fen("2r2r2/pk4pp/1p6/P1p1B3/8/2R2n2/2P2P1P/1R3K2").unwrap();
         game.init_magics();
 
         let mut expected = vec![
-            // rook at (1, 7)
-            Move::new((1, 7), (0, 7)),
-            Move::new((1, 7), (2, 7)),
-            Move::new((1, 7), (3, 7)),
-            Move::new((1, 7), (4, 7)),
-            Move::new((1, 7), (1, 6)),
-            Move::new((1, 7), (1, 5)),
-            Move::new((1, 7), (1, 4)),
-            Move::new((1, 7), (1, 3)),
-            Move::new((1, 7), (1, 2)),
+            // rook at b1 (1, 0)
+            Move::new((1, 0), (0, 0)), // a1
+            Move::new((1, 0), (2, 0)), // c1
+            Move::new((1, 0), (3, 0)), // d1
+            Move::new((1, 0), (4, 0)), // e1
+            Move::new((1, 0), (1, 1)), // b2
+            Move::new((1, 0), (1, 2)), // b3
+            Move::new((1, 0), (1, 3)), // b4
+            Move::new((1, 0), (1, 4)), // b5
+            Move::new((1, 0), (1, 5)), // b6 (capture)
 
-            // rook at (2, 5)
-            Move::new((2, 5), (0, 5)),
-            Move::new((2, 5), (1, 5)),
-            Move::new((2, 5), (3, 5)),
-            Move::new((2, 5), (4, 5)),
-            Move::new((2, 5), (5, 5)),
-            Move::new((2, 5), (2, 4)),
-            Move::new((2, 5), (2, 3)),
+            // rook at c3 (2, 2)
+            Move::new((2, 2), (0, 2)), // a3
+            Move::new((2, 2), (1, 2)), // b3
+            Move::new((2, 2), (3, 2)), // d3
+            Move::new((2, 2), (4, 2)), // e3
+            Move::new((2, 2), (5, 2)), // f3 (capture knight)
+            Move::new((2, 2), (2, 3)), // c4
+            Move::new((2, 2), (2, 4)), // c5 (capture)
         ];
         expected.sort();
 
@@ -568,25 +573,25 @@ mod tests {
 
         assert_eq!(moves, expected);
 
-        // rook at (0, 7) with pawn at (1, 6)
+        // rook at a1 (0, 0) with pawn at b2 (1, 1)
         let mut game = GameState::try_from_fen("8/8/8/8/8/8/1P6/R7").unwrap();
         game.init_magics();
 
         let mut expected = vec![
-            Move::new((0, 7), (1, 7)),
-            Move::new((0, 7), (2, 7)),
-            Move::new((0, 7), (3, 7)),
-            Move::new((0, 7), (4, 7)),
-            Move::new((0, 7), (5, 7)),
-            Move::new((0, 7), (6, 7)),
-            Move::new((0, 7), (7, 7)),
-            Move::new((0, 7), (0, 6)),
-            Move::new((0, 7), (0, 5)),
-            Move::new((0, 7), (0, 4)),
-            Move::new((0, 7), (0, 3)),
-            Move::new((0, 7), (0, 2)),
-            Move::new((0, 7), (0, 1)),
-            Move::new((0, 7), (0, 0)),
+            Move::new((0, 0), (1, 0)), // b1
+            Move::new((0, 0), (2, 0)), // c1
+            Move::new((0, 0), (3, 0)), // d1
+            Move::new((0, 0), (4, 0)), // e1
+            Move::new((0, 0), (5, 0)), // f1
+            Move::new((0, 0), (6, 0)), // g1
+            Move::new((0, 0), (7, 0)), // h1
+            Move::new((0, 0), (0, 1)), // a2
+            Move::new((0, 0), (0, 2)), // a3
+            Move::new((0, 0), (0, 3)), // a4
+            Move::new((0, 0), (0, 4)), // a5
+            Move::new((0, 0), (0, 5)), // a6
+            Move::new((0, 0), (0, 6)), // a7
+            Move::new((0, 0), (0, 7)), // a8
         ];
         expected.sort();
 
@@ -598,29 +603,30 @@ mod tests {
 
     #[test]
     pub fn bishop_moves() {
-        // Position with bishops at d3 and c1
+        // Position with bishops at d3 (3, 2) and c1 (2, 0)
+        // FEN: "r2qkb1r/ppp2ppp/2n2n2/4p3/3P4/2PB1R2/PP4PP/RNBQ2K1"
         let mut game = GameState::try_from_fen("r2qkb1r/ppp2ppp/2n2n2/4p3/3P4/2PB1R2/PP4PP/RNBQ2K1").unwrap();
         game.init_magics();
 
         let mut expected = vec![
             // bishop at c1 (2, 0)
-            Move::new((2, 7), (3, 6)), // d2
-            Move::new((2, 7), (4, 5)), // e3
-            Move::new((2, 7), (5, 4)), // f4
-            Move::new((2, 7), (6, 3)), // g5
-            Move::new((2, 7), (7, 2)), // h6
+            Move::new((2, 0), (3, 1)), // d2
+            Move::new((2, 0), (4, 2)), // e3
+            Move::new((2, 0), (5, 3)), // f4
+            Move::new((2, 0), (6, 4)), // g5
+            Move::new((2, 0), (7, 5)), // h6
 
             // bishop at d3 (3, 2)
-            Move::new((3, 5), (2, 6)), // c4
-            Move::new((3, 5), (2, 4)), // c4
-            Move::new((3, 5), (1, 3)), // b5
-            Move::new((3, 5), (0, 2)), // a6
-            Move::new((3, 5), (4, 4)), // e4
-            Move::new((3, 5), (5, 3)), // f5
-            Move::new((3, 5), (6, 2)), // g6
-            Move::new((3, 5), (7, 1)), // h7
-            Move::new((3, 5), (4, 6)), // e2
-            Move::new((3, 5), (5, 7)), // f1
+            Move::new((3, 2), (2, 1)), // c2
+            Move::new((3, 2), (2, 3)), // c4
+            Move::new((3, 2), (1, 4)), // b5
+            Move::new((3, 2), (0, 5)), // a6
+            Move::new((3, 2), (4, 3)), // e4
+            Move::new((3, 2), (5, 4)), // f5
+            Move::new((3, 2), (6, 5)), // g6
+            Move::new((3, 2), (7, 6)), // h7
+            Move::new((3, 2), (4, 1)), // e2
+            Move::new((3, 2), (5, 0)), // f1
         ];
         expected.sort();
 

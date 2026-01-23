@@ -32,13 +32,12 @@ fn get_diagonal_rays(x: u8, y: u8) -> (u64, u64) {
     let mut right_down: u64 = 0;
     let mut right_up: u64 = 0;
 
-    // shift right up diagonal to the line x-y
-    right_down = shr(right_down_diag, x - y);
+    right_down = shr(right_down_diag, x + y - 7);
 
     // clip residue bits
-    for i in 0..(x - y).abs() {
-        let shift_amt = if x >= y { i } else { -i };
-        let mask = if x >= y {
+    for i in 0..(x + y - 7).abs() {
+        let shift_amt = if x + y - 7 >= 0 { i } else { -i };
+        let mask = if x + y - 7 >= 0 {
             vertical_zeros_left
         } else {
             vertical_zeros_right
@@ -46,11 +45,11 @@ fn get_diagonal_rays(x: u8, y: u8) -> (u64, u64) {
         right_down &= shr(mask, shift_amt);
     }
 
-    right_up = shr(right_up_diag, x + y - 7);
+    right_up = shr(right_up_diag, x - y);
 
-    for i in 0..(x + y - 7).abs() {
-        let shift_amt = if x + y - 7 <= 0 { -i } else { i };
-        let mask = if x + y - 7 <= 0 {
+    for i in 0..(x - y).abs() {
+        let shift_amt = if x - y <= 0 { -i } else { i };
+        let mask = if x - y <= 0 {
             vertical_zeros_right
         } else {
             vertical_zeros_left
@@ -72,7 +71,7 @@ pub fn gen_blocked_diagonal(x: u8, y: u8, other_pieces: u64) -> u64 {
     let (right_down, right_up) = get_diagonal_rays(x, y);
 
     // partition board into areas relative to piece origin
-    let top_area = u64::MAX << (7 - y) * 8;
+    let top_area = if y == 7 { 0 } else { u64::MAX << ((y + 1) * 8) };
     let bottom_area = !top_area;
     // pretty sure this will work
     let right_area = u64::wrapping_mul((1u64 << 8 - x) - 1, COLUMN_LEFT) & !COLUMN_LEFT;
@@ -112,7 +111,7 @@ pub fn gen_straight_rays(x: u8, y: u8) -> (u64, u64) {
     let y = y as i8;
 
     let vert = shr(COLUMN_LEFT, x);
-    let horiz = shr(ROW_TOP, y * 8);
+    let horiz = shr(ROW_TOP, (7 - y) * 8);
 
     (vert & !piece_bb, horiz & !piece_bb)
 }
@@ -126,7 +125,7 @@ pub fn gen_straight_ray(x: u8, y: u8) -> u64 {
 pub fn gen_blocked_straight(x: u8, y: u8, other_pieces: u64) -> u64 {
     let (col, row) = gen_straight_rays(x, y);
 
-    let top_area = u64::MAX << (7 - y) * 8;
+    let top_area = u64::MAX << y * 8;
     let bottom_area = !top_area;
     let top_area = top_area << 8;
     let right_area = u64::wrapping_mul((1u64 << 8 - x) - 1, COLUMN_LEFT) & !COLUMN_LEFT;
@@ -161,12 +160,11 @@ pub fn gen_blocked_straight(x: u8, y: u8, other_pieces: u64) -> u64 {
 }
 
 pub fn gen_knight(x: u8, y: u8) -> u64 {
-    // centered at 2, 2
     const knight_moves: u64 = 0x5088008850000000;
     let x = x as i8;
     let y = y as i8;
 
-    let mut moves: u64 = shr(knight_moves, (x - 2) + (y - 2) * 8);
+    let mut moves: u64 = shr(knight_moves, (x - 2) + (5 - y) * 8);
     if x < 2 {
         moves &= vertical_zeros_right << 0;
         moves &= vertical_zeros_right << 1;
@@ -195,7 +193,7 @@ pub fn coords_to_left_shift(x: u8, y: u8) -> u8 {
 
 /// generate a bitboard with a single tile at the given position.
 pub fn coords_to_bb(x: u8, y: u8) -> u64 {
-    0b1u64 << 63 - (x + y * 8)
+    0b1u64 << (y * 8 + 7 - x)
 }
 
 /// right shift to bitboard cause I ain't typin this shit out every time
