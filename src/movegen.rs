@@ -180,17 +180,17 @@ pub fn gen_knight(x: u8, y: u8) -> u64 {
 
 
 /// convert a number of tiles - from left to right, bottom to top - to an (x, y) coordinate position
-pub fn shift_to_coords(offset: u8) -> (u8, u8) {
-    (offset % 8, offset / 8)
+pub fn right_shift_to_coords(offset: u8) -> (u8, u8) {
+    (offset % 8, 7 - (offset / 8))
 }
 
 // convert coordinates to right shift
 pub fn coords_to_right_shift(x: u8, y: u8) -> u8 {
-    x + y * 8
+    x + (7-y) * 8
 }
 
 pub fn coords_to_left_shift(x: u8, y: u8) -> u8 {
-    (7 - y) * 8 + 7 - x
+    y * 8 - x + 7
 }
 
 /// generate a bitboard with a single tile at the given position.

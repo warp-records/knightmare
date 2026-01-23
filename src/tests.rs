@@ -245,7 +245,7 @@ mod tests {
     pub fn magics_gen() {
         let mut rng = StdRng::seed_from_u64(0);
 
-        // for _ in 0..5 {
+        for _ in 0..10 {
             let rand_board: u64 = rng.random::<u64>() & rng.random::<u64>() & rng.random::<u64>();
             let straight = rng.random::<bool>();
 
@@ -279,7 +279,7 @@ mod tests {
             // }
             assert_eq!(magic_table.get_ray(blocker_board), Some(expected));
         }
-    // }
+    }
 
     #[test]
     pub fn rook_simple() {
