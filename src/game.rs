@@ -393,6 +393,20 @@ impl GameState {
     // if self.short_castle && short_castle_ray & whole_board == 0 {
 
     // }
+    /// use a bitboard as a
+    pub fn moves_from_bb<const N: usize>(mut moves_bb: u64, src: (u8, u8)) -> ArrayVec<Move, N> {
+        let mut moveset = ArrayVec::new();
+
+        while moves_bb != 0 {
+            let shift = moves_bb.leading_zeros();
+            let dest = right_shift_to_coords(shift as u8);
+            moveset.push(Move::new(src, dest));
+
+            moves_bb ^= rs_to_bb(shift);
+        }
+
+        moveset
+    }
 
     // ignore whether or not we're in check for now
     // castling moves implemented in king moves
@@ -404,12 +418,9 @@ impl GameState {
         let mut rooks_bb = self.self_bb() & self.rooks;
 
         for _ in 0..2 {
+            if rooks_bb == 0 { break; }
             let shift = rooks_bb.leading_zeros();
             let src = right_shift_to_coords(shift as u8);
-
-            if rooks_bb == 0 {
-                break;
-            }
 
             rooks_bb ^= rs_to_bb(shift);
 
@@ -419,14 +430,8 @@ impl GameState {
 
             moves_bb &= !self_bb;
 
-            while moves_bb != 0 {
-                let shift = moves_bb.leading_zeros();
-                let dest = right_shift_to_coords(shift as u8);
-                moveset.push(Move::new(src, dest));
-
-                moves_bb ^= rs_to_bb(shift);
-            }
-
+            let curr_moves = Self::moves_from_bb::<14>(moves_bb, src);
+            moveset.extend(curr_moves);
         }
 
         moveset
@@ -440,12 +445,10 @@ impl GameState {
         let mut bishops_bb = self.self_bb() & self.bishops;
 
         for _ in 0..2 {
+            if bishops_bb == 0 { break; }
+
             let shift = bishops_bb.leading_zeros();
             let src = right_shift_to_coords(shift as u8);
-
-            if bishops_bb == 0 {
-                break;
-            }
 
             bishops_bb ^= rs_to_bb(shift);
 
@@ -454,15 +457,8 @@ impl GameState {
             let mut moves_bb = magics_straight[src.0 as usize][src.1 as usize].get_ray(blockers).unwrap();
 
             moves_bb &= !self_bb;
-
-            while moves_bb != 0 {
-                let shift = moves_bb.leading_zeros();
-                let dest = right_shift_to_coords(shift as u8);
-                moveset.push(Move::new(src, dest));
-
-                moves_bb ^= rs_to_bb(shift);
-            }
-
+            let curr_moves = Self::moves_from_bb::<13>(moves_bb, src);
+            moveset.extend(curr_moves);
         }
 
         moveset
