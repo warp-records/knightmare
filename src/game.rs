@@ -476,7 +476,8 @@ impl GameState {
             let src = right_shift_to_coords(shift as u8);
 
             knights_bb ^= rs_to_bb(shift);
-            let moves_bb = gen_knight(src.0, src.1);
+            let mut moves_bb = gen_knight(src.0, src.1);
+            moves_bb &= !self_bb;
             let curr_moves = Self::moves_from_bb::<8>(moves_bb, src);
             moveset.extend(curr_moves);
         }
@@ -647,6 +648,35 @@ mod tests {
         expected.sort();
 
         let mut moves: Vec<Move> = game.bishop_moves().to_vec();
+        moves.sort();
+
+        assert_eq!(moves, expected);
+    }
+
+    #[test]
+    pub fn knight_moves() {
+        // position with black knights at f6 (5, 5) and b4 (1, 3)
+        let mut game = GameState::try_from_fen("r1bqr1k1/1p3pp1/p4n1p/3p4/1n1P4/2N4P/PPBQNPP1/R3R1K1").unwrap();
+        game.init_magics();
+        game.turn = Color::Black;
+
+        let mut expected = vec![
+            // knight at f6 (5, 5)
+            Move::new((5, 5), (7, 6)),
+            Move::new((5, 5), (7, 4)),
+            Move::new((5, 5), (3, 6)),
+            Move::new((5, 5), (6, 3)),
+            Move::new((5, 5), (4, 3)),
+
+            // knight at b4 (1, 3)
+            Move::new((1, 3), (3, 2)),
+            Move::new((1, 3), (2, 5)),
+            Move::new((1, 3), (2, 1)),
+            Move::new((1, 3), (0, 1)),
+        ];
+        expected.sort();
+
+        let mut moves: Vec<Move> = game.knight_moves().to_vec();
         moves.sort();
 
         assert_eq!(moves, expected);
