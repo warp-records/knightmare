@@ -463,6 +463,26 @@ impl GameState {
 
         moveset
     }
+
+    pub fn knight_moves(&self) -> ArrayVec<Move, 16> {
+        let mut moveset = ArrayVec::new();
+
+        let self_bb = self.self_bb();
+        let mut knights_bb = self.self_bb() & self.knights;
+
+        for _ in 0..2 {
+            if knights_bb == 0 { break; }
+            let shift = knights_bb.leading_zeros();
+            let src = right_shift_to_coords(shift as u8);
+
+            knights_bb ^= rs_to_bb(shift);
+            let moves_bb = gen_knight(src.0, src.1);
+            let curr_moves = Self::moves_from_bb::<8>(moves_bb, src);
+            moveset.extend(curr_moves);
+        }
+
+        moveset
+    }
 }
 
 #[cfg(test)]
