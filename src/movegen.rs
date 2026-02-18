@@ -176,6 +176,38 @@ pub fn gen_knight(x: u8, y: u8) -> u64 {
     moves
 }
 
+/// returns (move_board, threat_board)
+pub fn gen_pawn_moves(x: u8, y: u8, white: bool, first_move: bool) -> (u64, u64) {
+    // let x = x as i8;
+    // let y = y as i8;
+
+    // threat board of white pawn at position (1, 0)
+    let mut threat_board: u64 = 0xA0;
+    // move board of white pawn at (0, 0)
+    let mut move_board: u64 = 0x8000;
+    // double move board of white pawn at (0, 0)
+    const DOUBLE_MOVE_BOARD: u64 = 0x8080;
+
+    if first_move {
+        move_board = DOUBLE_MOVE_BOARD;
+        move_board <<= if white { 8 } else { 56 };
+        move_board >>= x;
+        threat_board <<= if white { 16 } else { 48 };
+        threat_board >>= x;
+        // start x position is 1
+        threat_board <<= 1;
+    } else {
+        if !white {
+            move_board <<= 56;
+            threat_board <<= 48;
+        }
+    }
+
+    (move_board, threat_board)
+}
+
+
+
 
 /// convert a number of tiles - from left to right, bottom to top - to an (x, y) coordinate position
 pub fn right_shift_to_coords(offset: u8) -> (u8, u8) {
@@ -200,3 +232,23 @@ pub fn coords_to_bb(x: u8, y: u8) -> u64 {
 pub fn rs_to_bb(right_shift: u32) -> u64 {
     0b1000000000000000000000000000000000000000000000000000000000000000u64 >> right_shift
 }
+
+
+// 00000000
+// 00000000
+// 00000000
+// 00000000
+// 00000000
+// 00000000
+// 00000000
+// 00000000
+
+
+// 00000000
+// 00000000
+// 00000000
+// 00000000
+// 00000000
+// 00000000
+// 10000000
+// 10000000

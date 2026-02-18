@@ -484,6 +484,26 @@ impl GameState {
 
         moveset
     }
+
+    // I think there's 30 possible pawn moves??
+    pub fn pawn_moves(&self) -> ArrayVec<Move, 30> {
+        let moveset = ArrayVec::new();
+
+        let self_bb = self.self_bb();
+        let mut pawns_bb = self_bb & self.pawns;
+
+        for _ in 0..8 {
+            if pawns_bb == 0 { break; }
+
+            let shift = self.pawns.leading_zeros();
+            let src = right_shift_to_coords(shift as u8);
+
+            pawns_bb &= !rs_to_bb(shift);
+
+        }
+
+        moveset
+    }
 }
 
 #[cfg(test)]
