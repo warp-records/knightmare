@@ -184,23 +184,30 @@ pub fn gen_pawn_moves(x: u8, y: u8, white: bool, first_move: bool) -> (u64, u64)
     // threat board of white pawn at position (1, 0)
     let mut threat_board: u64 = 0xA0;
     // move board of white pawn at (0, 0)
-    let mut move_board: u64 = 0x8000;
+    let mut move_board: u64 = 0x8000 << y*8;
     // double move board of white pawn at (0, 0)
     const DOUBLE_MOVE_BOARD: u64 = 0x8080;
 
     if first_move {
         move_board = DOUBLE_MOVE_BOARD;
         move_board <<= if white { 8 } else { 56 };
-        move_board >>= x;
         threat_board <<= if white { 16 } else { 48 };
-        threat_board >>= x;
         // start x position is 1
-        threat_board <<= 1;
     } else {
         if !white {
             move_board <<= 56;
             threat_board <<= 48;
         }
+    }
+
+    move_board >>= x;
+    threat_board >>= x;
+    threat_board <<= 1;
+
+    if x == 0 {
+        threat_board &= vertical_zeros_right
+    } else if x == 7 {
+        threat_board &= vertical_zeros_left
     }
 
     (move_board, threat_board)

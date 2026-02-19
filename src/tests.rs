@@ -297,6 +297,35 @@ mod tests {
 
     }
 
+    #[test]
+    pub fn pawn_bb() {
+        let (move_board, threat_board) = gen_pawn_moves(2, 1, true, true);
+
+        let expected_move_bb: u64 = chessboard!(
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00100000
+            0b_00100000
+            0b_00000000
+        );
+
+        let expected_threat_bb: u64 = chessboard!(
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_01010000
+            0b_00000000
+            0b_00000000
+        );
+
+        assert_eq!(move_board, expected_move_bb);
+        assert_eq!(threat_board, expected_threat_bb);
+    }
 }
 
 // 0 0 0 0 0 0 0 0
