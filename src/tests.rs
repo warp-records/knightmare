@@ -299,7 +299,7 @@ mod tests {
 
     #[test]
     pub fn pawn_bb() {
-        let (move_board, threat_board) = gen_pawn_moves(2, 1, true, true);
+        let (move_board, threat_board) = gen_pawn_moves(2, 1, true);
 
         let expected_move_bb: u64 = chessboard!(
             0b_00000000
@@ -325,6 +325,95 @@ mod tests {
 
         assert_eq!(move_board, expected_move_bb);
         assert_eq!(threat_board, expected_threat_bb);
+
+        let (move_board, threat_board) = gen_pawn_moves(0, 3, true);
+
+        let expected_move_bb: u64 = chessboard!(
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_10000000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+        );
+
+        let expected_threat_bb: u64 = chessboard!(
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_01000000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+        );
+
+        assert_eq!(move_board, expected_move_bb);
+        assert_eq!(threat_board, expected_threat_bb);
+
+        let (move_board, threat_board) = gen_pawn_moves(4, 5, false);
+
+        let expected_move_bb: u64 = chessboard!(
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00001000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+        );
+
+        let expected_threat_bb: u64 = chessboard!(
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00010100
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+        );
+
+        assert_eq!(move_board, expected_move_bb);
+        assert_eq!(threat_board, expected_threat_bb);
+
+        let (move_board, threat_board) = gen_pawn_moves(7, 2, false);
+
+        let expected_move_bb: u64 = chessboard!(
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00000001
+            0b_00000000
+        );
+
+        let expected_threat_bb: u64 = chessboard!(
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00000000
+            0b_00000010
+            0b_00000000
+        );
+
+        assert_eq!(move_board, expected_move_bb);
+        assert_eq!(threat_board, expected_threat_bb);
+
+        let (move_board, threat_board) = gen_pawn_moves(7, 7, true);
+
+        print_bitboard(move_board);
+        print_bitboard(threat_board);
+
+        assert_eq!(move_board, 0);
+        assert_eq!(threat_board, 0);
     }
 }
 

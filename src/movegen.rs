@@ -1,4 +1,4 @@
-use std::cmp::{max, min};
+use std::{cmp::{max, min}, thread};
 
 use crate::magic::print_bitboard;
 
@@ -177,9 +177,11 @@ pub fn gen_knight(x: u8, y: u8) -> u64 {
 }
 
 /// returns (move_board, threat_board)
-pub fn gen_pawn_moves(x: u8, y: u8, white: bool, first_move: bool) -> (u64, u64) {
+pub fn gen_pawn_moves(x: u8, y: u8, white: bool) -> (u64, u64) {
     // let x = x as i8;
     // let y = y as i8;
+
+    let first_move = (y == 1 && white) || (y == 6 && !white);
 
     // threat board of white pawn at position (1, 0)
     let mut threat_board: u64 = 0xA0;
@@ -195,8 +197,10 @@ pub fn gen_pawn_moves(x: u8, y: u8, white: bool, first_move: bool) -> (u64, u64)
         // start x position is 1
     } else {
         if !white {
-            move_board <<= 56;
-            threat_board <<= 48;
+            move_board >>= 16;
+            threat_board = threat_board.unbounded_shl(((y-1)*8) as u32);
+        } else {
+            threat_board = threat_board.unbounded_shl(((y+1)*8) as u32);
         }
     }
 

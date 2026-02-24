@@ -9,6 +9,11 @@ fn main() {
         println!("{art}");
     }
 
+    let a: u64 = 0b1;
+    let b = a.overflowing_shl(64);
+
+    println!("{:?} {:?}", a, b);
+
     // for _ in 0..100_000_000 {
     //     let x = rng.gen_range(0..8);
     //     let y = rng.gen_range(0..8);
