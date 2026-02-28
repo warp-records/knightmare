@@ -15,7 +15,7 @@ pub const ROW_BOTTOM: u64 = 0x00000000000000FF;
 const vertical_zeros_right: u64 = 0xFEFEFEFEFEFEFEFE;
 const vertical_zeros_left: u64 = 0x7F7F7F7F7F7F7F7F;
 
-fn shr(val: u64, dist: i8) -> u64 {
+pub fn shr(val: u64, dist: i8) -> u64 {
     if dist >= 0 {
         val >> dist
     } else {
@@ -244,7 +244,6 @@ pub fn rs_to_bb(right_shift: u32) -> u64 {
     0b1000000000000000000000000000000000000000000000000000000000000000u64 >> right_shift
 }
 
-
 // 00000000
 // 00000000
 // 00000000
@@ -253,7 +252,6 @@ pub fn rs_to_bb(right_shift: u32) -> u64 {
 // 00000000
 // 00000000
 // 00000000
-
 
 // 00000000
 // 00000000

@@ -504,6 +504,23 @@ impl GameState {
 
         moveset
     }
+
+    pub fn king_moves(&self) -> ArrayVec<Move, 10> {
+        let king_bb = self.self_bb() & self.kings;
+
+        let king_rshift: i8 = king_bb.leading_zeros() as i8;
+
+        // king bitboard at position (1, 1)
+        let mut move_board: u64 = 0x705060;
+        // right shift of the kings position in move_board
+        const MOVE_BOARD_RSHIFT: i8 = 49;
+
+        move_board = shr(move_board, king_rshift-MOVE_BOARD_RSHIFT);
+
+        let moveset = Self::moves_from_bb::<10>(move_board, right_shift_to_coords(king_rshift as u8));
+
+        moveset
+    }
 }
 
 #[cfg(test)]
