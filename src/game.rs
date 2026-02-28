@@ -719,3 +719,28 @@ mod tests {
         assert_eq!(moves, expected);
     }
 }
+
+#[test]
+pub fn king_moves() {
+    let mut game = GameState::try_from_fen("rnbqkbnr/pppppppp/8/3K4/8/8/PPPPPPPP/RNBQ1BNR").unwrap();
+    game.init_magics();
+    game.turn = Color::White;
+
+    let mut expected = vec![
+        Move::new((4, 4), (4, 5)),
+        Move::new((4, 4), (5, 5)),
+        Move::new((4, 4), (5, 4)),
+        Move::new((4, 4), (5, 3)),
+        Move::new((4, 4), (4, 3)),
+        Move::new((4, 4), (3, 3)),
+        Move::new((4, 4), (3, 4)),
+        Move::new((4, 4), (3, 5)),
+    ];
+    expected.sort();
+
+    let mut moves: Vec<Move> = game.king_moves().to_vec();
+    moves.sort();
+
+    assert_eq!(moves, expected);
+
+}
