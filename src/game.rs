@@ -32,7 +32,7 @@ enum Color {
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(u8)]
-enum PieceType {
+pub enum PieceType {
     King,
     Queen,
     Rook,
@@ -66,7 +66,7 @@ pub struct GameState {
 }
 
 #[derive(Debug, Clone)]
-struct Move {
+pub struct Move {
     // src_x: 0..=2
     // src_y: 3..=5
     // dest_x: 6..=8
