@@ -97,6 +97,9 @@ impl Ord for Move {
 }
 
 impl Move {
+    // stockfish uses this
+    const MAX_MOVES: usize = 256;
+
     pub fn new(src: (u8, u8), dest: (u8, u8)) -> Self {
         let mut fields: u16 = 0;
 
@@ -385,9 +388,8 @@ impl GameState {
     fn enemy_bb_mut(&mut self) -> &mut u64 {
         if self.turn == Color::White { &mut self.black } else { &mut self.white }
     }
-
     // (moves list, threat lines)
-    // pub fn king_moves(&self) -> ArrayVec<Move, 8> {
+    // pub fn king_moves(&self) -> ArrayVec<Move, { Move::MAX_MOVES }> {
     //     let mut moves = ArrayVec::new();
 
     //     let king_bb = if self.turn == Color::Black {
@@ -437,7 +439,7 @@ impl GameState {
 
     // }
     /// use a bitboard as a
-    pub fn moves_from_bb<const N: usize>(mut moves_bb: u64, src: (u8, u8)) -> ArrayVec<Move, N> {
+    pub fn moves_from_bb<const N: usize>(mut moves_bb: u64, src: (u8, u8)) -> ArrayVec<Move, { Move::MAX_MOVES }> {
         let mut moveset = ArrayVec::new();
 
         while moves_bb != 0 {
@@ -453,7 +455,7 @@ impl GameState {
 
     // ignore whether or not we're in check for now
     // castling moves implemented in king moves
-    pub fn rook_moves(&self) -> ArrayVec<Move, 28> {
+    pub fn rook_moves(&self) -> ArrayVec<Move, { Move::MAX_MOVES }> {
         let mut moveset = ArrayVec::new();
 
         let self_bb = self.self_bb();
@@ -480,7 +482,7 @@ impl GameState {
         moveset
     }
 
-    pub fn bishop_moves(&self) -> ArrayVec<Move, 26> {
+    pub fn bishop_moves(&self) -> ArrayVec<Move, { Move::MAX_MOVES }> {
         let mut moveset = ArrayVec::new();
 
         let self_bb = self.self_bb();
@@ -507,7 +509,7 @@ impl GameState {
         moveset
     }
 
-    pub fn knight_moves(&self) -> ArrayVec<Move, 16> {
+    pub fn knight_moves(&self) -> ArrayVec<Move, { Move::MAX_MOVES }> {
         let mut moveset = ArrayVec::new();
 
         let self_bb = self.self_bb();
@@ -529,7 +531,7 @@ impl GameState {
     }
 
     // I think there's 30 possible pawn moves??
-    pub fn pawn_moves(&self) -> ArrayVec<Move, 30> {
+    pub fn pawn_moves(&self) -> ArrayVec<Move, { Move::MAX_MOVES }> {
         let moveset = ArrayVec::new();
 
         let self_bb = self.self_bb();
@@ -548,7 +550,7 @@ impl GameState {
         moveset
     }
 
-    pub fn king_moves(&self) -> ArrayVec<Move, 10> {
+    pub fn king_moves(&self) -> ArrayVec<Move, { Move::MAX_MOVES }> {
         let king_bb = self.self_bb() & self.kings;
 
         let king_rshift: i8 = king_bb.leading_zeros() as i8;
@@ -574,7 +576,7 @@ impl GameState {
     }
 
     // TODO: support N queens
-    // pub fn queen_moves(&self) -> ArrayVec<Move, 54> {
+    // pub fn queen_moves(&self) -> ArrayVec<Move, { Move::MAX_MOVES }> {
     //     let mut moves = ArrayVec::new();
 
     //     let mut queens_bb: u64 = self.self_bb() & self.queens;
