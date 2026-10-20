@@ -139,6 +139,8 @@ pub fn gen_blocked_straight(x: u8, y: u8, other_pieces: u64) -> u64 {
     }
 
     let nearest = (other_pieces & bottom_area).trailing_zeros();
+    // note: ok if overflow occurs here, NOT a bug
+    // maybe change to wrapping_sub
     let mut bottom_ray = (u64::MAX << min(nearest - 1, 64)) & col & bottom_area;
     if bottom_ray == 0 {
         bottom_ray = col & bottom_area;
