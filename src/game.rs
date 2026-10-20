@@ -96,6 +96,27 @@ impl Ord for Move {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[repr(u8)]
+pub enum PromoPiece {
+    Knight = 0,
+    Bishop = 1,
+    Rook = 2,
+    Queen = 3,
+}
+
+impl From<u8> for PromoPiece {
+    fn from(num: u8) -> Self {
+        match num {
+            0 => PromoPiece::Knight,
+            1 => PromoPiece::Bishop,
+            2 => PromoPiece::Rook,
+            3 => PromoPiece::Queen,
+            _ => unreachable!(),
+        }
+    }
+}
+
 impl Move {
     // stockfish uses this
     const MAX_MOVES: usize = 256;
@@ -117,10 +138,12 @@ impl Move {
     pub fn src_y(&self) -> u8 { (self.fields >> 3 & 0b111) as u8 }
     pub fn dest_x(&self) -> u8 { (self.fields >> 6 & 0b111) as u8 }
     pub fn dest_y(&self) -> u8 { (self.fields >> 9 & 0b111) as u8 }
-    pub fn is_promo(&self) -> u8 { (self.fields >> 12 & 0b1) as u8 }
-    pub fn promo_type(&self) -> u8 { (self.fields >> 13 & 0b11) as u8 }
+    pub fn is_promo(&self) -> bool { (self.fields >> 12 & 0b1) != 0 }
+    pub fn promo_type(&self) -> Option<PromoPiece> { 
+        self.is_promo().then(|| PromoPiece::from((self.fields >> 13 & 0b11) as u8))
+    }
 
-    pub fn set_promo(&mut self, piece_type: PieceType) {
+    pub fn set_promo(&mut self, piece_type: PromoPiece) {
         self.fields |= 0b1 << 12;
         self.fields |= (piece_type as u16) << 13;
     }
@@ -131,6 +154,7 @@ struct MagicsDb {
     magics_straight: [[MagicTable; 8]; 8],
     magics_diagonal: [[MagicTable; 8]; 8],
 }
+
 impl GameState {
 
     const MAGICS_FILE_PATH: &str = "magics/magics.db";
