@@ -564,7 +564,7 @@ impl GameState {
         for _ in 0..8 {
             if pawns_bb == 0 { break; }
 
-            let shift = self.pawns.leading_zeros();
+            let shift = pawns_bb.leading_zeros();
             let src = right_shift_to_coords(shift as u8);
 
             pawns_bb &= !rs_to_bb(shift);
